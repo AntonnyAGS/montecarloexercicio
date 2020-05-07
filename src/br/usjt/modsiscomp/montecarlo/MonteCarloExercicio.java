@@ -83,6 +83,7 @@ public class MonteCarloExercicio extends JFrame implements ActionListener {
         String filePath = fieldImgFilePath.getText();
         try {
             int size = Integer.parseInt(JOptionPane.showInputDialog(null, "Número de pontos a serem gerados"));
+            int steps = Integer.parseInt(JOptionPane.showInputDialog(null, "Número de passos a serem executados"));
             File file= new File(filePath);
             BufferedImage imageB = ImageIO.read(file);
 
@@ -90,37 +91,22 @@ public class MonteCarloExercicio extends JFrame implements ActionListener {
             int width = imageB.getWidth();
             int height = imageB.getHeight();
 
-
-            // Getting pixel color by position x=100 and y=40 
-
-            // System.out.println("Ponto: [90,90] --> "+findColor(imageB,90,90));
-
-            //System.out.println("Ponto: [200,200] --> "+findColor(imageB,200,200));
-            
-            //labelImage.setIcon(new ImageIcon(imageB));
-            
-            //paintPixel(imageB,90,90);
-            
-            //labelImage.setIcon(new ImageIcon(imageB));
-
             // Generating randons
-            Pair[] result = generateRandons(size, width, height);
-
+            
             labelImage.setIcon(new ImageIcon(imageB));
-            int cont = 0;
-            for (Pair pair : result) {
-                System.out.println(pair.toString());
-                int[] color = findColor(imageB, pair.getX(), pair.getY());
-                if (isBlack(color)){
-                    cont++;
-                }
 
-                paintPixel(imageB,pair.getX(),pair.getY());
+            double result = 0;
+            for(int i = 0; i < steps; i++){
+                int blackPoints = paintAndCount(width, height, imageB, size);
+                System.out.println("Pontos Pretos: " + blackPoints);
+                double parcialResult = calculateArea(width, height, blackPoints, size);
+                System.out.println("Área calculada no passo " + i + ": " + parcialResult);
+                result = result + parcialResult;
             }
+            System.out.println("Media da area: " + (result/steps));
+            JOptionPane.showMessageDialog(null, "Media estimada da area: " + (result/steps));
+
             labelImage.setIcon(new ImageIcon(imageB));
-            System.out.println("\n PONTOS EM PRETO: " + cont);
-            double calculateArea = calculateArea(width, height, cont, size);
-            System.out.println("\n AREA: " + calculateArea);
             
              
         } catch (Exception ex) {
@@ -128,6 +114,20 @@ public class MonteCarloExercicio extends JFrame implements ActionListener {
         }      
     }
     
+    private int paintAndCount(int width,int height, BufferedImage imageB, int size){
+        Pair[] result = generateRandons(size, width, height);
+        int count = 0;
+        for (Pair pair : result) {
+            System.out.println(pair.toString());
+            int[] color = findColor(imageB, pair.getX(), pair.getY());
+            if (isBlack(color)){
+                count++;
+            }
+            paintPixel(imageB,pair.getX(),pair.getY());
+        }
+        return count;
+    }
+
     private int[] findColor(BufferedImage image, int x, int y) {
         int clr=  image.getRGB(x,y); 
         int  red   = (clr & 0x00ff0000) >> 16;
@@ -136,6 +136,7 @@ public class MonteCarloExercicio extends JFrame implements ActionListener {
         int[] result = {red, green, blue};
         return result;
     }
+    
     private boolean isBlack(int[] rgb){
         boolean[] result = {false, false, false};
         for (int i = 0; i < rgb.length; i++){
@@ -147,6 +148,7 @@ public class MonteCarloExercicio extends JFrame implements ActionListener {
             if(!b) return false;
             return true;
     }
+    
     private Image paintPixel(BufferedImage image, int x, int y) {
     	Graphics2D g2d = image.createGraphics();
     	g2d.setColor(Color.RED);
@@ -163,6 +165,7 @@ public class MonteCarloExercicio extends JFrame implements ActionListener {
 
         return result;
     }
+    
     private Pair[] generateRandons(int size, int maxWidth, int maxHeight){
         Pair[] result = new Pair[size];
         for (int i = 0; i < size; i++){
