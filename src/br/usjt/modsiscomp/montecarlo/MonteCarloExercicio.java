@@ -84,19 +84,19 @@ public class MonteCarloExercicio extends JFrame implements ActionListener {
         try {
             int size = Integer.parseInt(JOptionPane.showInputDialog(null, "Número de pontos a serem gerados"));
             int steps = Integer.parseInt(JOptionPane.showInputDialog(null, "Número de passos a serem executados"));
-            File file= new File(filePath);
-            BufferedImage imageB = ImageIO.read(file);
-
+            
             // Getting height and width 
-            int width = imageB.getWidth();
-            int height = imageB.getHeight();
-
+            
             // Generating randons
             
-            labelImage.setIcon(new ImageIcon(imageB));
-
+            
             double result = 0;
             for(int i = 0; i < steps; i++){
+                File file= new File(filePath);
+                BufferedImage imageB = ImageIO.read(file);
+                int width = imageB.getWidth();
+                int height = imageB.getHeight();
+                labelImage.setIcon(new ImageIcon(imageB));
                 int blackPoints = paintAndCount(width, height, imageB, size);
                 System.out.println("Pontos Pretos: " + blackPoints);
                 double parcialResult = calculateArea(width, height, blackPoints, size);
@@ -105,8 +105,7 @@ public class MonteCarloExercicio extends JFrame implements ActionListener {
             }
             System.out.println("Media da area: " + (result/steps));
             JOptionPane.showMessageDialog(null, "Media estimada da area: " + (result/steps));
-
-            labelImage.setIcon(new ImageIcon(imageB));
+            
             
              
         } catch (Exception ex) {
@@ -152,7 +151,7 @@ public class MonteCarloExercicio extends JFrame implements ActionListener {
     private Image paintPixel(BufferedImage image, int x, int y) {
     	Graphics2D g2d = image.createGraphics();
     	g2d.setColor(Color.RED);
-    	g2d.fillRect(x, y, 1, 1);
+    	g2d.fillRect(x, y, 2, 2);
     	g2d.dispose();
     	return image;
     }
